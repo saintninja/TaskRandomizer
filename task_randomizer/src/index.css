@@ -1,0 +1,207 @@
+:root {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-title {
+  text-align: center;
+  color: #2563eb;
+  margin-bottom: 30px;
+}
+
+.controls-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.control-input,
+.control-textarea,
+.control-select {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+  font-family: inherit;
+}
+
+.control-input:focus,
+.control-textarea:focus,
+.control-select:focus {
+  border-color: #2563eb;
+}
+
+.control-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.buttons-row {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary {
+  background-color: #10b981;
+  color: white;
+}
+.btn-secondary:hover {
+  background-color: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-reset {
+  background-color: #ef4444;
+  color: white;
+}
+.btn-reset:hover {
+  background-color: #dc2626;
+}
+
+.visualization-area {
+  min-height: 400px;
+  position: relative;
+}
+
+.students-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.student-card {
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+  color: #1e3a8a;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.group-container {
+  background: white;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: border-color 0.3s;
+}
+
+.group-container.active {
+  border: 2px solid #2563eb;
+  background: #f8fafc;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+.group-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.group-count {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.students-in-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 50px;
+}
+
+.variant-badge {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+  align-self: flex-start;
+}
