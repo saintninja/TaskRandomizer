@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { useState, useMemo, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { Student, Group } from './types';
-import { assignVariants, shuffleArray, chunkArray } from './utils/array';
+import { shuffleArray, chunkArray, assignVariants } from './utils/array';
 import {
   DEFAULT_STUDENTS_TEXT,
   DEFAULT_GROUP_SIZE,
@@ -10,6 +10,7 @@ import {
 import { ControlsPanel } from './components/ControlsPanel';
 import { StudentsPool } from './components/StudentsPool';
 import { GroupsGrid } from './components/GroupsGrid';
+import { useDragAndDrop } from './hooks/useDragAndDrop';
 
 const parseStudents = (text: string): Student[] =>
   text
@@ -34,6 +35,51 @@ function App() {
     () => parseStudents(studentsText),
     [studentsText]
   );
+
+  const handleSwap = useCallback((studentA: Student, studentB: Student) => {
+    setGroups((prevGroups) => {
+      const groupA = prevGroups.find((g) =>
+        g.students.some((s) => s.id === studentA.id)
+      );
+      const groupB = prevGroups.find((g) =>
+        g.students.some((s) => s.id === studentB.id)
+      );
+
+      if (!groupA || !groupB || groupA.id === groupB.id) {
+        return prevGroups;
+      }
+
+      return prevGroups.map((g) => {
+        if (g.id === groupA.id) {
+          return {
+            ...g,
+            students: g.students.map((s) =>
+              s.id === studentA.id ? studentB : s
+            ),
+          };
+        }
+        if (g.id === groupB.id) {
+          return {
+            ...g,
+            students: g.students.map((s) =>
+              s.id === studentB.id ? studentA : s
+            ),
+          };
+        }
+        return g;
+      });
+    });
+  }, []);
+
+  const {
+    draggedStudent,
+    dragPosition,
+    startDrag,
+    moveDrag,
+    endDrag,
+    isDragging,
+    isDropTarget,
+  } = useDragAndDrop(groups, handleSwap);
 
   const handleFormGroups = (): void => {
     if (parsedStudents.length === 0) return;
@@ -73,9 +119,19 @@ function App() {
     setIsAssigned(false);
   };
 
+  const overlayStyle = draggedStudent
+    ? {
+        position: 'fixed' as const,
+        left: dragPosition.x - 70,
+        top: dragPosition.y - 22,
+        pointerEvents: 'none' as const,
+        zIndex: 9999,
+      }
+    : {};
+
   return (
     <div className="app-container">
-      <h1 className="app-title">Генератор групп и вариантов</h1>
+      <h1 className="app-title">🎓 Генератор команд и вариантов</h1>
 
       <ControlsPanel
         studentsText={studentsText}
@@ -94,9 +150,37 @@ function App() {
       <div className="visualization-area">
         <AnimatePresence mode="wait">
           {!isGrouped && <StudentsPool students={parsedStudents} />}
-          {isGrouped && <GroupsGrid groups={groups} isAssigned={isAssigned} />}
+          {isGrouped && (
+            <GroupsGrid
+              groups={groups}
+              isAssigned={isAssigned}
+              isDragging={isDragging}
+              isDropTarget={isDropTarget}
+              onDragStart={startDrag}
+              onDragMove={moveDrag}
+              onDragEnd={endDrag}
+            />
+          )}
         </AnimatePresence>
       </div>
+
+      {}
+      <AnimatePresence>
+        {draggedStudent && (
+          <motion.div
+            className="drag-overlay"
+            style={overlayStyle}
+            initial={{ scale: 1.1, rotate: 0 }}
+            animate={{ scale: 1.1, rotate: 2 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          >
+            <div className="student-card student-card--clone">
+              {draggedStudent.name}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

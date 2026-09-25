@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Group } from '../types';
+import type { Group, Student } from '../types';
 import { StudentCard } from './StudentCard';
 import { VariantBadge } from './VariantBadge';
 
@@ -7,9 +7,29 @@ interface GroupContainerProps {
   group: Group;
   groupIndex: number;
   isAssigned: boolean;
+  isDragging: (studentId: string) => boolean;
+  isDropTarget: (studentId: string) => boolean;
+  onDragStart: (
+    student: Student,
+    groupId: string,
+    cardRect: DOMRect,
+    clientX: number,
+    clientY: number
+  ) => void;
+  onDragMove: (clientX: number, clientY: number) => void;
+  onDragEnd: () => void;
 }
 
-export const GroupContainer = ({ group, groupIndex, isAssigned }: GroupContainerProps) => {
+export const GroupContainer = ({
+  group,
+  groupIndex,
+  isAssigned,
+  isDragging,
+  isDropTarget,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
+}: GroupContainerProps) => {
   const studentsCount = group.students.length;
   const studentWord = studentsCount === 1 ? 'студент' : 'студента';
 
@@ -33,16 +53,22 @@ export const GroupContainer = ({ group, groupIndex, isAssigned }: GroupContainer
 
       <div className="students-in-group" layout>
         {group.students.map((student) => (
-          <StudentCard key={student.id} student={student} />
+          <StudentCard
+            key={student.id}
+            student={student}
+            groupId={group.id}
+            isDragging={isDragging(student.id)}
+            isDropTarget={isDropTarget(student.id)}
+            onDragStart={onDragStart}
+            onDragMove={onDragMove}
+            onDragEnd={onDragEnd}
+          />
         ))}
       </div>
 
       <AnimatePresence>
         {isAssigned && group.variant !== null && (
-          <VariantBadge
-            variant={group.variant}
-            delay={groupIndex * 0.15}
-          />
+          <VariantBadge variant={group.variant} delay={groupIndex * 0.15} />
         )}
       </AnimatePresence>
     </motion.div>
