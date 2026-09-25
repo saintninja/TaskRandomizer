@@ -9,11 +9,28 @@ export const shuffleArray = <T,>(array: readonly T[]): T[] => {
 
 export const chunkArray = <T,>(array: readonly T[], size: number): T[][] => {
   if (size <= 0) {
-    throw new Error('Chunk size must be greater than 0');
+    throw new Error('Размер чанка должен быть больше 0');
   }
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
     result.push(array.slice(i, i + size));
   }
   return result;
+};
+
+export const assignVariants = (
+  groupsCount: number,
+  variantsCount: number
+): number[] => {
+  if (groupsCount <= 0 || variantsCount <= 0) {
+    return [];
+  }
+
+  const shuffledVariants = shuffleArray(
+    Array.from({ length: variantsCount }, (_, i) => i + 1)
+  );
+
+  return Array.from({ length: groupsCount }, (_, i) =>
+    shuffledVariants[i % variantsCount]
+  );
 };

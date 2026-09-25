@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import type { Student, Group } from './types';
-import { shuffleArray, chunkArray } from './utils/array';
+import { assignVariants, shuffleArray, chunkArray } from './utils/array';
 import {
   DEFAULT_STUDENTS_TEXT,
   DEFAULT_GROUP_SIZE,
@@ -56,9 +56,11 @@ function App() {
   const handleAssignVariants = (): void => {
     if (variantsCount <= 0 || groups.length === 0) return;
 
-    const updatedGroups: Group[] = groups.map((group) => ({
+    const variants = assignVariants(groups.length, variantsCount);
+
+    const updatedGroups: Group[] = groups.map((group, index) => ({
       ...group,
-      variant: Math.floor(Math.random() * variantsCount) + 1,
+      variant: variants[index],
     }));
 
     setGroups(updatedGroups);
