@@ -240,3 +240,128 @@ body {
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
   cursor: grabbing;
 }
+
+.control-hint {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.control-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.control-checkbox input:disabled {
+  cursor: not-allowed;
+}
+
+.task-lists-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.task-lists-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.task-lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.task-list-top {
+  display: flex;
+  gap: 8px;
+}
+
+.task-list-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-add {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border: 2px solid #bfdbfe;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+.btn-add:hover:not(:disabled) {
+  background-color: #dbeafe;
+}
+
+.btn-icon {
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 8px;
+  width: 38px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-icon:hover:not(:disabled) {
+  background: #fecaca;
+}
+
+.btn:disabled,
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.group-tasks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.group-task {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+}
+
+.group-task__list {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.group-task__value {
+  font-weight: 600;
+  color: #065f46;
+  word-break: break-word;
+}

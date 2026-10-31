@@ -1,7 +1,13 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { Student, Group } from './types';
-import { shuffleArray, chunkArray, assignVariants } from './utils/array';
+import type { Student, Group, TaskList } from './types';
+import {
+  shuffleArray,
+  chunkArray,
+  assignVariants,
+  distributeEvenly,
+} from './utils/array';
+import { parseTasks } from './utils/tasks';
 import {
   DEFAULT_STUDENTS_TEXT,
   DEFAULT_GROUP_SIZE,
@@ -27,6 +33,10 @@ function App() {
   const [groupSize, setGroupSize] = useState<number>(DEFAULT_GROUP_SIZE);
   const [variantsCount, setVariantsCount] = useState<number>(DEFAULT_VARIANTS_COUNT);
 
+  const [distributeVariants, setDistributeVariants] = useState<boolean>(true);
+  const [taskLists, setTaskLists] = useState<TaskList[]>([]);
+  const taskListCounter = useRef<number>(0);
+
   const [groups, setGroups] = useState<Group[]>([]);
   const [isGrouped, setIsGrouped] = useState<boolean>(false);
   const [isAssigned, setIsAssigned] = useState<boolean>(false);
@@ -35,6 +45,40 @@ function App() {
     () => parseStudents(studentsText),
     [studentsText]
   );
+
+  const activeLists = useMemo(
+    () =>
+      taskLists
+        .map((list, index) => ({
+          id: list.id,
+          name: list.name.trim() || `Список ${index + 1}`,
+          tasks: parseTasks(list.tasksText),
+        }))
+        .filter((list) => list.tasks.length > 0),
+    [taskLists]
+  );
+
+  const hasTaskLists = activeLists.length > 0;
+  const variantsEnabled = distributeVariants || !hasTaskLists;
+
+  const handleAddTaskList = useCallback(() => {
+    taskListCounter.current += 1;
+    const id = `list-${taskListCounter.current}`;
+    setTaskLists((prev) => [...prev, { id, name: '', tasksText: '' }]);
+  }, []);
+
+  const handleUpdateTaskList = useCallback(
+    (id: string, patch: Partial<Omit<TaskList, 'id'>>) => {
+      setTaskLists((prev) =>
+        prev.map((list) => (list.id === id ? { ...list, ...patch } : list))
+      );
+    },
+    []
+  );
+
+  const handleRemoveTaskList = useCallback((id: string) => {
+    setTaskLists((prev) => prev.filter((list) => list.id !== id));
+  }, []);
 
   const handleSwap = useCallback((studentA: Student, studentB: Student) => {
     setGroups((prevGroups) => {
@@ -92,6 +136,7 @@ function App() {
       title: `Группа ${index + 1}`,
       students,
       variant: null,
+      tasks: [],
     }));
 
     setGroups(newGroups);
@@ -100,13 +145,27 @@ function App() {
   };
 
   const handleAssignVariants = (): void => {
-    if (variantsCount <= 0 || groups.length === 0) return;
+    if (groups.length === 0) return;
+    if (variantsEnabled && variantsCount <= 0) return;
+    if (!variantsEnabled && !hasTaskLists) return;
 
-    const variants = assignVariants(groups.length, variantsCount);
+    const variants = variantsEnabled
+      ? assignVariants(groups.length, variantsCount)
+      : [];
+
+    const picksPerList = activeLists.map((list) => ({
+      list,
+      picks: distributeEvenly(list.tasks, groups.length),
+    }));
 
     const updatedGroups: Group[] = groups.map((group, index) => ({
       ...group,
-      variant: variants[index],
+      variant: variantsEnabled ? variants[index] : null,
+      tasks: picksPerList.map(({ list, picks }) => ({
+        listId: list.id,
+        listName: list.name,
+        task: picks[index],
+      })),
     }));
 
     setGroups(updatedGroups);
@@ -140,6 +199,13 @@ function App() {
         onGroupSizeChange={setGroupSize}
         variantsCount={variantsCount}
         onVariantsCountChange={setVariantsCount}
+        distributeVariants={variantsEnabled}
+        canDisableVariants={hasTaskLists}
+        onDistributeVariantsChange={setDistributeVariants}
+        taskLists={taskLists}
+        onAddTaskList={handleAddTaskList}
+        onUpdateTaskList={handleUpdateTaskList}
+        onRemoveTaskList={handleRemoveTaskList}
         isGrouped={isGrouped}
         isAssigned={isAssigned}
         onFormGroups={handleFormGroups}
@@ -164,7 +230,6 @@ function App() {
         </AnimatePresence>
       </div>
 
-      {}
       <AnimatePresence>
         {draggedStudent && (
           <motion.div
