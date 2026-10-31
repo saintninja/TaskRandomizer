@@ -51,7 +51,7 @@ export const GroupContainer = ({
         </span>
       </div>
 
-      <div className="students-in-group" layout>
+      <div className="students-in-group">
         {group.students.map((student) => (
           <StudentCard
             key={student.id}
@@ -68,7 +68,28 @@ export const GroupContainer = ({
 
       <AnimatePresence>
         {isAssigned && group.variant !== null && (
-          <VariantBadge variant={group.variant} delay={groupIndex * 0.15} />
+          <VariantBadge
+            key="variant"
+            variant={group.variant}
+            delay={groupIndex * 0.15}
+          />
+        )}
+        {isAssigned && group.tasks.length > 0 && (
+          <motion.ul
+            key="tasks"
+            className="group-tasks"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: groupIndex * 0.15 + 0.1 }}
+          >
+            {group.tasks.map((item) => (
+              <li key={item.listId} className="group-task">
+                <span className="group-task__list">{item.listName}</span>
+                <span className="group-task__value">{item.task}</span>
+              </li>
+            ))}
+          </motion.ul>
         )}
       </AnimatePresence>
     </motion.div>
