@@ -18,6 +18,21 @@ export const chunkArray = <T,>(array: readonly T[], size: number): T[][] => {
   return result;
 };
 
+export const distributeEvenly = <T,>(
+  items: readonly T[],
+  count: number
+): T[] => {
+  if (count <= 0 || items.length === 0) {
+    return [];
+  }
+
+  const result: T[] = [];
+  while (result.length < count) {
+    result.push(...shuffleArray(items));
+  }
+  return result.slice(0, count);
+};
+
 export const assignVariants = (
   groupsCount: number,
   variantsCount: number
@@ -26,11 +41,8 @@ export const assignVariants = (
     return [];
   }
 
-  const shuffledVariants = shuffleArray(
-    Array.from({ length: variantsCount }, (_, i) => i + 1)
-  );
-
-  return Array.from({ length: groupsCount }, (_, i) =>
-    shuffledVariants[i % variantsCount]
+  return distributeEvenly(
+    Array.from({ length: variantsCount }, (_, i) => i + 1),
+    groupsCount
   );
 };
