@@ -16,11 +16,7 @@ export const StudentsPool = ({ students }: StudentsPoolProps) => {
       layout
     >
       {students.map((student) => (
-        <StudentCard
-          key={student.id}
-          student={student}
-          animateEntrance
-        />
+        <StudentCard key={student.id} student={student} groupId="pool" />
       ))}
     </motion.div>
   );

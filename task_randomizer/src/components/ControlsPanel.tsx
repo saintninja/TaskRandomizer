@@ -1,5 +1,6 @@
 import type { ControlsPanelProps } from './ControlsPanel.types';
 import { GROUP_SIZE_OPTIONS } from '../utils/constants';
+import { parseTasks } from '../utils/tasks';
 
 export const ControlsPanel = ({
   studentsText,
@@ -8,12 +9,25 @@ export const ControlsPanel = ({
   onGroupSizeChange,
   variantsCount,
   onVariantsCountChange,
+  distributeVariants,
+  canDisableVariants,
+  onDistributeVariantsChange,
+  taskLists,
+  onAddTaskList,
+  onUpdateTaskList,
+  onRemoveTaskList,
   isGrouped,
   isAssigned,
   onFormGroups,
   onAssignVariants,
   onReset,
 }: ControlsPanelProps) => {
+  const assignLabel = !distributeVariants
+    ? 'Назначить задачи'
+    : canDisableVariants
+      ? 'Назначить варианты и задачи'
+      : 'Назначить варианты';
+
   return (
     <>
       <div className="controls-panel">
@@ -54,8 +68,23 @@ export const ControlsPanel = ({
             className="control-input"
             value={variantsCount}
             onChange={(e) => onVariantsCountChange(Number(e.target.value))}
-            disabled={isAssigned}
+            disabled={isAssigned || !distributeVariants}
           />
+
+          <label className="control-checkbox">
+            <input
+              type="checkbox"
+              checked={distributeVariants}
+              onChange={(e) => onDistributeVariantsChange(e.target.checked)}
+              disabled={isAssigned || !canDisableVariants}
+            />
+            Распределять варианты
+          </label>
+          {!canDisableVariants && (
+            <span className="control-hint">
+              Отключить можно, когда есть хотя бы один список задач
+            </span>
+          )}
         </div>
 
         <div
@@ -68,6 +97,71 @@ export const ControlsPanel = ({
         </div>
       </div>
 
+      <div className="task-lists-panel">
+        <div className="task-lists-header">
+          <span className="control-label">
+            Списки задач:
+          </span>
+          <button
+            className="btn btn-add"
+            onClick={onAddTaskList}
+            disabled={isAssigned}
+          >
+            + Добавить список
+          </button>
+        </div>
+
+        {taskLists.length === 0 && (
+          <p className="control-hint">
+            Списков пока нет. Добавьте список заданий
+          </p>
+        )}
+
+        <div className="task-lists-grid">
+          {taskLists.map((list, index) => {
+            const tasksCount = parseTasks(list.tasksText).length;
+            return (
+              <div className="task-list" key={list.id}>
+                <div className="task-list-top">
+                  <input
+                    className="control-input task-list-name"
+                    value={list.name}
+                    placeholder={`Список ${index + 1} (название)`}
+                    onChange={(e) =>
+                      onUpdateTaskList(list.id, { name: e.target.value })
+                    }
+                    disabled={isAssigned}
+                  />
+                  <button
+                    className="btn-icon"
+                    onClick={() => onRemoveTaskList(list.id)}
+                    disabled={isAssigned}
+                    aria-label={`Удалить список ${index + 1}`}
+                    title="Удалить список"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <textarea
+                  className="control-textarea"
+                  value={list.tasksText}
+                  onChange={(e) =>
+                    onUpdateTaskList(list.id, { tasksText: e.target.value })
+                  }
+                  placeholder="Каждая задача с новой строки"
+                  disabled={isAssigned}
+                />
+                <span className="control-hint">
+                  {tasksCount === 0
+                    ? 'Список пуст и будет проигнорирован'
+                    : `Уникальных задач: ${tasksCount}`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="buttons-row">
         {!isGrouped && (
           <button className="btn btn-primary" onClick={onFormGroups}>
@@ -76,7 +170,7 @@ export const ControlsPanel = ({
         )}
         {isGrouped && !isAssigned && (
           <button className="btn btn-secondary" onClick={onAssignVariants}>
-            Назначить варианты
+            {assignLabel}
           </button>
         )}
       </div>
