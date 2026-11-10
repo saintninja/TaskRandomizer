@@ -221,7 +221,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1 className="app-title">🎓 Генератор команд и вариантов</h1>
+      <h1 className="app-title">Генератор команд и вариантов</h1>
 
       <ControlsPanel
         studentsText={studentsText}
