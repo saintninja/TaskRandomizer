@@ -100,7 +100,8 @@ export const ControlsPanel = ({
       <div className="task-lists-panel">
         <div className="task-lists-header">
           <span className="control-label">
-            Списки задач:
+            Списки задач (каждой группе достаётся по одной задаче из каждого
+            списка):
           </span>
           <button
             className="btn btn-add"
@@ -113,7 +114,8 @@ export const ControlsPanel = ({
 
         {taskLists.length === 0 && (
           <p className="control-hint">
-            Списков пока нет. Добавьте список заданий
+            Списков пока нет. Добавьте список: названия файлов, номера задач,
+            названия методов и т.п.
           </p>
         )}
 

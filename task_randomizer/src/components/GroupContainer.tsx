@@ -7,6 +7,8 @@ interface GroupContainerProps {
   group: Group;
   groupIndex: number;
   isAssigned: boolean;
+  variantOptions?: number[];
+  onVariantChange?: (groupId: string, variant: number) => void;
   isDragging: (studentId: string) => boolean;
   isDropTarget: (studentId: string) => boolean;
   onDragStart: (
@@ -24,6 +26,8 @@ export const GroupContainer = ({
   group,
   groupIndex,
   isAssigned,
+  variantOptions,
+  onVariantChange,
   isDragging,
   isDropTarget,
   onDragStart,
@@ -72,6 +76,8 @@ export const GroupContainer = ({
             key="variant"
             variant={group.variant}
             delay={groupIndex * 0.15}
+            options={variantOptions}
+            onChange={(variant) => onVariantChange?.(group.id, variant)}
           />
         )}
         {isAssigned && group.tasks.length > 0 && (

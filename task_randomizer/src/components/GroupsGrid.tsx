@@ -5,6 +5,8 @@ import { GroupContainer } from './GroupContainer';
 interface GroupsGridProps {
   groups: Group[];
   isAssigned: boolean;
+  variantOptions?: number[];
+  onVariantChange?: (groupId: string, variant: number) => void;
   isDragging: (studentId: string) => boolean;
   isDropTarget: (studentId: string) => boolean;
   onDragStart: (
@@ -21,6 +23,8 @@ interface GroupsGridProps {
 export const GroupsGrid = ({
   groups,
   isAssigned,
+  variantOptions,
+  onVariantChange,
   isDragging,
   isDropTarget,
   onDragStart,
@@ -40,6 +44,8 @@ export const GroupsGrid = ({
           group={group}
           groupIndex={index}
           isAssigned={isAssigned}
+          variantOptions={variantOptions}
+          onVariantChange={onVariantChange}
           isDragging={isDragging}
           isDropTarget={isDropTarget}
           onDragStart={onDragStart}

@@ -8,6 +8,7 @@ import {
   distributeEvenly,
 } from './utils/array';
 import { parseTasks } from './utils/tasks';
+import { changeGroupVariant } from './utils/variants';
 import {
   DEFAULT_STUDENTS_TEXT,
   DEFAULT_GROUP_SIZE,
@@ -40,6 +41,7 @@ function App() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [isGrouped, setIsGrouped] = useState<boolean>(false);
   const [isAssigned, setIsAssigned] = useState<boolean>(false);
+  const [variantNotice, setVariantNotice] = useState<string | null>(null);
 
   const parsedStudents: Student[] = useMemo(
     () => parseStudents(studentsText),
@@ -60,6 +62,14 @@ function App() {
 
   const hasTaskLists = activeLists.length > 0;
   const variantsEnabled = distributeVariants || !hasTaskLists;
+
+  const variantOptions = useMemo(
+    () =>
+      variantsEnabled && variantsCount > 0
+        ? Array.from({ length: variantsCount }, (_, i) => i + 1)
+        : [],
+    [variantsEnabled, variantsCount]
+  );
 
   const handleAddTaskList = useCallback(() => {
     taskListCounter.current += 1;
@@ -170,12 +180,33 @@ function App() {
 
     setGroups(updatedGroups);
     setIsAssigned(true);
+    setVariantNotice(null);
+  };
+
+  const handleChangeVariant = (groupId: string, newVariant: number): void => {
+    const target = groups.find((g) => g.id === groupId);
+    if (!target || target.variant === newVariant) return;
+
+    const { groups: updated, swappedWith } = changeGroupVariant(
+      groups,
+      groupId,
+      newVariant,
+      variantsCount
+    );
+
+    setGroups(updated);
+    setVariantNotice(
+      swappedWith && target.variant !== null
+        ? `${target.title} и ${swappedWith.title} обменялись вариантами: ${target.title} → № ${newVariant}, ${swappedWith.title} → № ${target.variant}`
+        : null
+    );
   };
 
   const handleReset = (): void => {
     setGroups([]);
     setIsGrouped(false);
     setIsAssigned(false);
+    setVariantNotice(null);
   };
 
   const overlayStyle = draggedStudent
@@ -214,12 +245,15 @@ function App() {
       />
 
       <div className="visualization-area">
+        {variantNotice && <p className="variant-notice">{variantNotice}</p>}
         <AnimatePresence mode="wait">
           {!isGrouped && <StudentsPool students={parsedStudents} />}
           {isGrouped && (
             <GroupsGrid
               groups={groups}
               isAssigned={isAssigned}
+              variantOptions={variantOptions}
+              onVariantChange={handleChangeVariant}
               isDragging={isDragging}
               isDropTarget={isDropTarget}
               onDragStart={startDrag}
